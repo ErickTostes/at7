@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css'; // Importar o estilo padrão do Quill
+import 'react-quill/dist/quill.snow.css';
 import './EditProduct.css';
 
 const EditProduct = () => {

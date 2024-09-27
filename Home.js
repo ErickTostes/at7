@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
+import DeleteModal from './DeleteModal';
 
 const Home = ({ setIsAuthenticated }) => {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [favorites, setFavorites] = useState([]);
   const [viewMode, setViewMode] = useState('grid');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -81,6 +84,23 @@ const Home = ({ setIsAuthenticated }) => {
     setViewMode(viewMode === 'grid' ? 'list' : 'grid');
   };
 
+  const openDeleteModal = (productId) => {
+    setProductToDelete(productId);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    const token = localStorage.getItem('token');
+    await fetch(`https://api-infnet-produtos-privado.vercel.app/produtos/${productToDelete}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: token,
+      },
+    });
+    setProducts(products.filter(product => product._id !== productToDelete));
+    setIsModalOpen(false);
+  };
+
   return (
     <div className="home-container">
       <h1>Catálogo de Produtos</h1>
@@ -111,9 +131,15 @@ const Home = ({ setIsAuthenticated }) => {
               {favorites.includes(product._id) ? 'Desmarcar Favorito' : 'Marcar como Favorito'}
             </button>
             <button onClick={() => navigate(`/products/${product._id}`)}>Ver Detalhes</button>
+            <button onClick={() => openDeleteModal(product._id)}>Excluir</button>
           </div>
         ))}
       </div>
+      <DeleteModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleDelete}
+      />
     </div>
   );
 };
